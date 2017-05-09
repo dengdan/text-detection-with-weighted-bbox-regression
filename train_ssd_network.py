@@ -39,8 +39,8 @@ tf.app.flags.DEFINE_float(
 # =========================================================================== #
 # General Flags.
 # =========================================================================== #
-size = 300
-tf.app.flags.DEFINE_string('train_dir', util.io.get_absolute_path('~/temp/ssd-%d/'%(size)),'Directory where checkpoints and event logs are written to.')
+tf.app.flags.DEFINE_string('train_dir', util.io.get_absolute_path('~/temp_nfs/text-detection-with-wbr-%d-new-ap/'%(size)),'Directory where checkpoints and event logs are written to.')
+
 tf.app.flags.DEFINE_integer('num_clones', 1,'Number of model clones to deploy.')
 tf.app.flags.DEFINE_boolean('clone_on_cpu', False,
                             'Use CPUs to deploy clones.')

@@ -62,7 +62,7 @@ tf.app.flags.DEFINE_boolean(
 # =========================================================================== #
 # Main evaluation flags.
 # =========================================================================== #
-size = 300
+size = 512
 postfix = '-new-ap'
 tf.app.flags.DEFINE_integer(
     'num_classes', 2, 'Number of classes to use in the dataset.')

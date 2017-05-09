@@ -10,7 +10,7 @@ def _convert_to_example(image_data, labels, labels_text, bboxes, shape, difficul
       image_data: string, JPEG encoding of RGB image;
       labels: list of integers, identifier for the ground truth;
       labels_text: list of strings, human-readable labels;
-      bboxes: list of bounding boxes; each box is a list of integers;
+      bboxes: list of bounding boxes; each box is a list of floats in [0, 1];
           specifying [xmin, ymin, xmax, ymax]. All boxes are assumed to belong
           to the same label as the image label.
       shape: 3 integers, image shapes in pixels.

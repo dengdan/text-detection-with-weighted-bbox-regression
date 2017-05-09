@@ -39,7 +39,9 @@ slim = tf.contrib.slim
 LIST_RECALLS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85,
                 0.90, 0.95, 0.96, 0.97, 0.98, 0.99]
 DATA_FORMAT = 'NHWC'
-
+size = 512
+ckpt_path = '~/temp_nfs/text-detection-with-wbr-512-new-ap'
+dump_path = '~/temp_nfs/no-use/ssd-text-%d/'%(size)
 # =========================================================================== #
 # SSD evaluation Flags.
 # =========================================================================== #
@@ -73,11 +75,11 @@ tf.app.flags.DEFINE_integer(
 tf.app.flags.DEFINE_string(
     'master', '', 'The address of the TensorFlow master to use.')
 tf.app.flags.DEFINE_string(
-    'checkpoint_path', util.io.get_absolute_path('~/temp_nfs/text-detection-with-wbr/'),
+    'checkpoint_path', util.io.get_absolute_path(ckpt_path),
     'The directory where the model was written to or an absolute path to a '
     'checkpoint file.')
 tf.app.flags.DEFINE_string(
-    'eval_dir', util.io.get_absolute_path('~/temp_nfs/text-detection-with-wbr/eval/'), 'Directory where the results are saved to.')
+    'eval_dir', util.io.get_absolute_path('%s/eval/'%(ckpt_path)), 'Directory where the results are saved to.')
 tf.app.flags.DEFINE_integer(
     'num_preprocessing_threads', 4,
     'The number of threads used to create the batches.')
@@ -88,7 +90,7 @@ tf.app.flags.DEFINE_string(
 tf.app.flags.DEFINE_string(
     'dataset_dir', util.io.get_absolute_path('~/dataset_nfs/SSD-tf/ICDAR'), 'The directory where the dataset files are stored.')
 tf.app.flags.DEFINE_string(
-    'model_name', 'ssd_300_vgg', 'The name of the architecture to evaluate.')
+    'model_name', 'ssd_%d_vgg'%(size), 'The name of the architecture to evaluate.')
 tf.app.flags.DEFINE_string(
     'preprocessing_name', None, 'The name of the preprocessing to use. If left '
     'as `None`, then the model_name flag is used.')
@@ -184,7 +186,7 @@ def main(_):
         else:
             num_batches = math.ceil(dataset.num_samples / float(FLAGS.batch_size))
         
-        def write_result(image_name, image_data, bboxes, scores, path = '~/temp_nfs/no-use/ssd-300-%s'%(util.io.get_filename(ckpt.model_checkpoint_path))):
+        def write_result(image_name, image_data, bboxes, scores, path = util.io.join_path(dump_path, util.io.get_filename(ckpt.model_checkpoint_path))):
           filename = util.io.join_path(path, 'res_%s.txt'%(image_name))
           print filename
           h, w = image_data.shape[0:-1]
@@ -194,7 +196,7 @@ def main(_):
           bboxes[:, 3] = bboxes[:, 3] * w
           lines = []
           for b_idx, bscore in enumerate(scores):
-                if bscore < 0.01:
+                if bscore < 0.1 or b_idx > 5:
                   break
                 bbox = bboxes[b_idx, :]
                 [ymin, xmin, ymax, xmax] = [int(v) for v in bbox]
@@ -214,9 +216,9 @@ def main(_):
           bboxes[:, 2] = bboxes[:, 2] * h
           bboxes[:, 3] = bboxes[:, 3] * w
           for b_idx, bscore in enumerate(scores):
-                #if bscore < 0.5:
-                #  break
-                if b_idx > 10:
+               # if bscore < 0.5:
+               #   break
+                if b_idx > 5 :
                   break;
                 bbox = bboxes[b_idx, :]
                 [ymin, xmin, ymax, xmax] = [int(v) for v in bbox]
@@ -239,8 +241,8 @@ def main(_):
               write_result(name, image_data, bbox_pred, bbox_score)
               img_gt = draw_bbox(image_data, bbox_data, label_data, color = util.img.COLOR_GREEN)
               img_pred = draw_bbox(image_data, bbox_pred, bbox_score, util.img.COLOR_RGB_RED)
-              util.img.imwrite('~/temp_nfs/no-use/ssd-300/%s_test.jpg'%(name), img_pred, rgb = True)
-              util.img.imwrite('~/temp_nfs/no-use/ssd-300/%s_gt.jpg'%(name), img_gt, rgb = True)
+              util.img.imwrite('~/temp_nfs/no-use/ssd-512/%s_test.jpg'%(name), img_pred, rgb = True)
+              util.img.imwrite('~/temp_nfs/no-use/ssd-512/%s_gt.jpg'%(name), img_gt, rgb = True)
 
 if __name__ == '__main__':
     tf.app.run()
